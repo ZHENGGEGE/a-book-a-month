@@ -2,15 +2,37 @@ package sysinit
 
 import (
   "github.com/astaxie/beego"
-  _ "github.com/astaxie/beego"
   "github.com/astaxie/beego/orm"
-  _ "github.com/astaxie/beego/orm"
   _ "github.com/go-sql-driver/mysql"
 )
 
-func dbinit(alias string)  {
+func dbinit(aliases ...string)  {
+
+  isDev:= "dev"==beego.AppConfig.String("runmode")
+
+  if len(aliases)>0{
+    for _,alias:=range aliases{
+      registerDatabase(alias)
+      //主库自动建表
+      if "w"==alias {
+        orm.RunSyncdb("default",false,isDev)
+      }
+    }
+  }else{
+    registerDatabase("w")
+    orm.RunSyncdb("default",false,isDev)
+  }
+
+
+}
+
+func registerDatabase(alias string)  {
+  if len(alias)<=0 {
+    return
+  }
+  //连接名称
   dbAlias:=alias // default
-  if "w"==alias||"default"==alias||len(alias)<=0 {
+  if "w"==alias||"default"==alias {
     dbAlias = alias
     alias = "w"
   }
@@ -27,10 +49,4 @@ func dbinit(alias string)  {
   dbPort:=beego.AppConfig.String("db_"+alias+"_port")
   //root:135246@tcp(127.0.0.1:3306)/book?charset=utf8
   orm.RegisterDataBase(dbAlias,"mysql",dbUser+dbPwd+":"+"@tcp("+dbHost+":"+dbPort+")"+dbName+"charset=utf8",30)
-
-  isDev:= "dev"==beego.AppConfig.String("runmode")
-
-  if "w"==alias {
-    orm.RunSyncdb("default",false,isDev)
-  }
 }
