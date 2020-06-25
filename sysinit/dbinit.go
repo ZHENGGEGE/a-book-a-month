@@ -7,7 +7,7 @@ import (
 )
 
 func dbinit(aliases ...string)  {
-
+  //如果是开发模式，则显示命令信息
   isDev:= "dev"==beego.AppConfig.String("runmode")
 
   if len(aliases)>0{
@@ -47,6 +47,6 @@ func registerDatabase(alias string)  {
   dbHost:=beego.AppConfig.String("db_"+alias+"_host")
   //数据库端口
   dbPort:=beego.AppConfig.String("db_"+alias+"_port")
-  //root:135246@tcp(127.0.0.1:3306)/book?charset=utf8
+  //root:edd%L0+h3tjj@tcp(127.0.0.1:3306)/book?charset=utf8
   orm.RegisterDataBase(dbAlias,"mysql",dbUser+dbPwd+":"+"@tcp("+dbHost+":"+dbPort+")"+dbName+"charset=utf8",30)
 }
